@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+</head>
+
+<body>
+
+    
+
+    <label for="ville">Ville :</label>
+<input type="text" name="ville" id="ville">
+<button onclick="getRatesHistory()">prévisions</button>
+
+<br><br><br><br><br>
+<div id="meteo" />
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { packages: ['corechart'], 'language': 'fr' });
+        //google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart(result) {
+            // Define the chart to be drawn.
+            console.log(result);
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Element');
+            data.addColumn('number', 'Percentage');
+            data.addRows([
+                ['Nitrogen', 0.68],
+                ['Oxygen', 0.21],
+                ['Other', 0.11]
+            ]);
+
+            // Instantiate and draw the chart.
+            var chart = new google.visualization.PieChart(document.getElementById('meteo'));
+            chart.draw(data, null);
+        }
+
+        
+        let API_Key = "7475e3e916b70f8218f6fd88a99732b9";
+
+        function getRatesHistory() {
+            let url = "https://api.openweathermap.org/data/2.5/forecast?q=" + $("#ville").val() + "&units=metric&appid=" + API_Key;
+            //howWaiting();
+            //updateRequestCount();
+            $.ajax({
+                url: url,
+                headers: { 'apikey': API_Key },
+                success: (result) => {
+                    lastRequestResult = result;
+                    //hideWaiting();
+                    //compile_Rates_History();
+                    drawChart(result);
+                }
+            })
+        }
+    </script>
+
+</html>
