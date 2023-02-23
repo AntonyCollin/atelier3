@@ -24,31 +24,54 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
-        google.charts.load('current', { packages: ['corechart'], 'language': 'fr' });
-        //google.charts.setOnLoadCallback(drawChart);
+google.charts.load('current', {packages: ['corechart', 'line']});
+            //google.charts.setOnLoadCallback(drawChart);
 
         function drawChart(result) {
             // Define the chart to be drawn.
-            console.log(result);
+            console.log(result.list);
             var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Element');
-            data.addColumn('number', 'Percentage');
-            data.addRows([
-                ['Nitrogen', 0.68],
-                ['Oxygen', 0.21],
-                ['Other', 0.11]
-            ]);
+            data.addColumn("date", 'Jour');
+            data.addColumn('number', 'Min');
+            data.addColumn('number', 'Max');
+            
+            //data.addColumn('string', 'Element');
+            //data.addColumn('number', 'Percentage');
+
+             result.list.forEach(day => {
+                console.log(day.main.temp_min,day.main.temp_max,day.dt_txt);
+
+                data.addRows([[new Date(day.dt_txt),day.main.temp_min,day.main.temp_max,]]);
+            });
+
+            
+  var options = {
+    chart: {
+      title: 'Température',
+      subtitle: 'en degré celcius'
+    },
+    width: 900,
+    height: 500,
+    hAxis: {
+      title: 'Jour'
+    },
+    vAxes: {
+      0: {
+        title: 'Temperature (°C)',
+      },
+    },
+  };
 
             // Instantiate and draw the chart.
-            var chart = new google.visualization.PieChart(document.getElementById('meteo'));
-            chart.draw(data, null);
+            var chart = new google.visualization.LineChart(document.getElementById('meteo'));
+            chart.draw(data, options);
         }
 
         
         let API_Key = "7475e3e916b70f8218f6fd88a99732b9";
 
         function getRatesHistory() {
-            let url = "https://api.openweathermap.org/data/2.5/forecast?q=" + $("#ville").val() + "&units=metric&appid=" + API_Key;
+            let url = "https://cors-anywhere.herokuapp.com/https://api.openweathermap.org/data/2.5/forecast?q=" + $("#ville").val() + "&units=metric&appid=" + API_Key;
             //howWaiting();
             //updateRequestCount();
             $.ajax({
@@ -56,6 +79,9 @@
                 headers: { 'apikey': API_Key },
                 success: (result) => {
                     lastRequestResult = result;
+                    
+                    console.log(result);   
+                    
                     //hideWaiting();
                     //compile_Rates_History();
                     drawChart(result);
